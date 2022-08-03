@@ -1,5 +1,6 @@
 {
-    "name": "com.kelvip.quick-scene-switcher",
+    "name": "QuickSceneSwitcher",
+    "rootNamespace": "",
     "references": [],
     "includePlatforms": [
         "Editor"
