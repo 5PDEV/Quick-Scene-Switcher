@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Object = UnityEngine.Object;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
@@ -248,13 +249,14 @@ public class QuickSceneSwitcher : EditorWindow
     private void CloseAdditionalScene(SceneAsset scene)
     {
         string scenePath = AssetDatabase.GetAssetPath(scene);
+        Scene sceneObj = EditorSceneManager.GetSceneByPath(scenePath);
 
         // Check if there are unsaved changes in the current scene and
         // ask if the user wants to save them before switching to the new scene
         // If the user chooses 'cancel', don't switch scenes
-        if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        if (EditorSceneManager.SaveModifiedScenesIfUserWantsTo(new [] { sceneObj }))
         {
-            EditorSceneManager.CloseScene(EditorSceneManager.GetSceneByPath(scenePath), true);
+            EditorSceneManager.CloseScene(sceneObj, true);
             SavePrefs();
         }
     }
