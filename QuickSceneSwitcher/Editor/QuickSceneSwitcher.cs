@@ -20,15 +20,9 @@ public class QuickSceneSwitcher : EditorWindow
 
     private long nextLoad = 0;
 
-    // Prefix used to store preferences
-    // Format is: QuickSceneSwitcher/DefaultCompany/ProjectName/
-    private string PREFS_PREFIX;
-
     // Initialization
     void OnEnable()
     {
-        PREFS_PREFIX = $"QuickSceneSwitcher/{Application.companyName}/{Application.productName}/";
-
         // Style vars
         heightLayout = GUILayout.Height(22);
 
@@ -139,7 +133,6 @@ public class QuickSceneSwitcher : EditorWindow
                 else // if NOT in 'EditMode'
                 {
                     if (scenes[i] == null) continue;
-                    
                     if (hidden) continue;
                     
                     if (category != lastCategory)
@@ -153,16 +146,27 @@ public class QuickSceneSwitcher : EditorWindow
                     
                     // Disable button if it corresponds to the currently open scene
                     bool isCurrentScene = IsCurrentScene(scenes[i]);
+                    bool isAdditionalScene = IsAdditionalScene(scenes[i]);
                     
                     if (isCurrentScene)
                     {
                         EditorGUI.BeginDisabledGroup(true);
-                        GUILayout.Toggle(true, "X", buttonStyleBold, heightLayout, GUILayout.MaxWidth(25));
+                        GUILayout.Toggle(true, "O", buttonStyleBold, heightLayout, GUILayout.MaxWidth(25));
+                        GUILayout.Toggle(true, "-", buttonStyleBold, heightLayout, GUILayout.MaxWidth(25));
                         EditorGUI.EndDisabledGroup();
                     }
                     else
                     {
                         if (GUILayout.Toggle(false, "O", buttonStyleBold, heightLayout, GUILayout.MaxWidth(25))) OpenScene(scenes[i]);
+
+                        if (isAdditionalScene)
+                        {
+                            if (!GUILayout.Toggle(true, "-", buttonStyleBold, heightLayout, GUILayout.MaxWidth(25))) CloseAdditionalScene(scenes[i]);
+                        }
+                        else
+                        {
+                            if (GUILayout.Toggle(false, "+", buttonStyleBold, heightLayout, GUILayout.MaxWidth(25))) OpenAdditionalScene(scenes[i]);
+                        }
                     }
 
                     EditorGUI.BeginDisabledGroup(true);
@@ -231,6 +235,40 @@ public class QuickSceneSwitcher : EditorWindow
     private bool IsCurrentScene(SceneAsset scene)
     {
         return EditorSceneManager.GetActiveScene().path == AssetDatabase.GetAssetPath(scene);
+    }
+
+    private void OpenAdditionalScene(SceneAsset scene)
+    {
+        string scenePath = AssetDatabase.GetAssetPath(scene);
+        
+        EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
+        SavePrefs();
+    }
+
+    private void CloseAdditionalScene(SceneAsset scene)
+    {
+        string scenePath = AssetDatabase.GetAssetPath(scene);
+
+        // Check if there are unsaved changes in the current scene and
+        // ask if the user wants to save them before switching to the new scene
+        // If the user chooses 'cancel', don't switch scenes
+        if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        {
+            EditorSceneManager.CloseScene(EditorSceneManager.GetSceneByPath(scenePath), true);
+            SavePrefs();
+        }
+    }
+    
+    private bool IsAdditionalScene(SceneAsset scene)
+    {
+        string scenePath = AssetDatabase.GetAssetPath(scene);
+
+        for (int i = 0; i < EditorSceneManager.sceneCount; i++)
+        {
+            if (EditorSceneManager.GetSceneAt(i).path == scenePath) return true;
+        }
+
+        return false;
     }
 
     #endregion
