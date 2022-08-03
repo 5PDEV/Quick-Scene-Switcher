@@ -7,7 +7,6 @@ using UnityEditor.PackageManager;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Object = UnityEngine.Object;
 using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 public class QuickSceneSwitcher : EditorWindow
@@ -34,7 +33,7 @@ public class QuickSceneSwitcher : EditorWindow
     [MenuItem("Window/Quick Scene Switcher")]
     public static void ShowWindow()
     {
-        GetWindow<QuickSceneSwitcher>("Scene Switcher");
+        GetWindow<QuickSceneSwitcher>("Quick Scene Switcher");
     }
 
     void OnGUI()
@@ -152,21 +151,21 @@ public class QuickSceneSwitcher : EditorWindow
                     if (isCurrentScene)
                     {
                         EditorGUI.BeginDisabledGroup(true);
-                        GUILayout.Toggle(true, "O", buttonStyleBold, heightLayout, GUILayout.MaxWidth(25));
-                        GUILayout.Toggle(true, "-", buttonStyleBold, heightLayout, GUILayout.MaxWidth(25));
+                        GUILayout.Toggle(true, new GUIContent("O", "Load scene as primary and unload all others"), buttonStyleBold, heightLayout, GUILayout.MaxWidth(25));
+                        GUILayout.Toggle(true, new GUIContent("-", "Unload scene"), buttonStyleBold, heightLayout, GUILayout.MaxWidth(25));
                         EditorGUI.EndDisabledGroup();
                     }
                     else
                     {
-                        if (GUILayout.Toggle(false, "O", buttonStyleBold, heightLayout, GUILayout.MaxWidth(25))) OpenScene(scenes[i]);
+                        if (GUILayout.Toggle(false, new GUIContent("O", "Load scene as primary and unload all others"), buttonStyleBold, heightLayout, GUILayout.MaxWidth(25))) OpenScene(scenes[i]);
 
                         if (isAdditionalScene)
                         {
-                            if (!GUILayout.Toggle(true, "-", buttonStyleBold, heightLayout, GUILayout.MaxWidth(25))) CloseAdditionalScene(scenes[i]);
+                            if (!GUILayout.Toggle(true, new GUIContent("-", "Unload scene"), buttonStyleBold, heightLayout, GUILayout.MaxWidth(25))) CloseAdditionalScene(scenes[i]);
                         }
                         else
                         {
-                            if (GUILayout.Toggle(false, "+", buttonStyleBold, heightLayout, GUILayout.MaxWidth(25))) OpenAdditionalScene(scenes[i]);
+                            if (GUILayout.Toggle(false, new GUIContent("+", "Load scene"), buttonStyleBold, heightLayout, GUILayout.MaxWidth(25))) OpenAdditionalScene(scenes[i]);
                         }
                     }
 
