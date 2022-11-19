@@ -211,7 +211,7 @@ public class QuickSceneSwitcher : EditorWindow
 
     public string GetSceneCategory(SceneAsset s)
     {
-        return string.Join('/', AssetDatabase.GetAssetOrScenePath(s).Split("/").Take(2));
+        return string.Join('/', AssetDatabase.GetAssetOrScenePath(s).Split("/").Skip(1).Take(2));
     }
     
     #region SceneManagement
